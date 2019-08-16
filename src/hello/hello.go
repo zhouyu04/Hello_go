@@ -1,7 +1,6 @@
 package main
 
 import (
-	"customerMap"
 	"fmt"
 	"unsafe"
 )
@@ -17,16 +16,16 @@ const (
 	ccc = unsafe.Sizeof(aaa)
 )
 
-func main() {
-
-	var key = "b"
-	var hashcode = 0
-
-	for i := range key {
-
-	}
-
-}
+//func main() {
+//
+//	var key = "b"
+//	var hashcode = 0
+//
+//	for i := range key {
+//
+//	}
+//
+//}
 
 //hello world
 //func main()  {

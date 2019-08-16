@@ -2,6 +2,8 @@ package main
 
 import (
 	"crypto/md5"
+	"dbs"
+	"entity"
 	"fmt"
 	"html/template"
 	"io"
@@ -67,6 +69,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 	username := r.Form["username"]
 	password := r.Form["password"]
 
+	//[]string --> string
+	//name := strings.Join(username, "")
+	//pwd := strings.Join(password, "")
+
 	if len(r.Form["username"][0]) == 0 {
 		//为空的处理
 		message := "用户名不能为空"
@@ -85,9 +91,30 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(username)
 	fmt.Println(password)
 
-	t, _ := template.ParseFiles("src/views/success.html")
-	t.Execute(w, nil)
+	//success, db := dbs.OpenDB()
+	//if success {
+	//	fmt.Println("open success")
+	//} else {
+	//	fmt.Println("open faile")
+	//}
+	//user,flag := dbs.Sele(dbs.Dbconn, name, pwd)
 
+	var terminalsMapper entity.TerminalsMapper
+	//dbs.Engine.WriteMapperPtr(&terminalsMapper,)
+
+	terminals, e := terminalsMapper.SelectAll()
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	fmt.Println(terminals)
+	if terminals == nil {
+		t, _ := template.ParseFiles("src/views/error.html")
+		t.Execute(w, "用户名或密码不存在")
+	} else {
+		t, _ := template.ParseFiles("src/views/success.html")
+		t.Execute(w, "success")
+	}
 }
 
 func main() {
@@ -96,6 +123,7 @@ func main() {
 	http.HandleFunc("/index", toIndex)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/test", testParameter)
+	dbs.InitDB()
 	err := http.ListenAndServe(":9090", nil) //设置监听的端口
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
