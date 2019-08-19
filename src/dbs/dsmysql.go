@@ -2,9 +2,15 @@ package dbs
 
 import (
 	"database/sql"
+	"entity"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
 )
 
 const (
@@ -23,12 +29,46 @@ var Dbconn *sql.DB
 
 var Engine = GoMybatis.GoMybatisEngine{}.New()
 
+var regStruct map[string]interface{}
+
+func initModel() {
+	regStruct = make(map[string]interface{})
+	regStruct["TerminalsMapper"] = entity.TerminalsMapper{}
+}
+
 func InitDB() {
-	_, err := Engine.Open("mysql", DB_Driver2)
+
+	fmt.Println("初始化模板........")
+	initModel()
+
+	fmt.Println("初始化数据库连接..................")
+	var engine = GoMybatis.GoMybatisEngine{}.New()
+	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	_, err := engine.Open("mysql", DB_Driver2) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
-	fmt.Println("初始化DB完成.............")
+
+	//读取mapper xml文件
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	fmt.Println("项目路径:", dir)
+	mapperPath := dir + "/src/mapper"
+	fmt.Println("mapper文件夹路径:", mapperPath)
+	//获取文件夹下所有mapper文件
+	infos, _ := ioutil.ReadDir(mapperPath)
+	for _, file := range infos {
+		name := file.Name()
+		fmt.Println("文件名:", name)
+		if strings.Contains(name, "Mapper.xml") {
+			bytes, _ := ioutil.ReadFile(mapperPath + "/" + name)
+			//var terminalsMapper TerminalsMapper
+			mapper := strings.Replace(name, ".xml", "", -1)
+			t := reflect.ValueOf(regStruct[mapper]).Type()
+			//设置对应的mapper xml文件
+			engine.WriteMapperPtr(&t, bytes)
+		}
+
+	}
 }
 
 func OpenDB() (success bool, db *sql.DB) {

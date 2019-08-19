@@ -1,6 +1,7 @@
 package test
 
 import (
+	"dbs"
 	"entity"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" //选择需要的数据库驱动导入
@@ -52,12 +53,14 @@ func TestGoMybaatis(t *testing.T) {
 
 func Test_select(t *testing.T) {
 
-	terminalMapper := entity.InitMapperByLocalSession()
+	//entity.InitMapperByLocalSession()
+	dbs.InitDB()
 
+	terminalsMapper := entity.Engine.GetObj("TerminalsMapper").(*entity.TerminalsMapper)
 	//terminals, _ := terminalMapper.SelectAll()
 
 	//var id = 1
-	terminals, _ := terminalMapper.SelectById("1")
+	terminals, _ := terminalsMapper.SelectById("1")
 
 	//i := terminals[0]
 
