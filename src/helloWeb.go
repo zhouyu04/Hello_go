@@ -87,28 +87,19 @@ func login(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, message)
 		return
 	}
+	fmt.Println(username[0])
+	fmt.Println(password[0])
 
-	fmt.Println(username)
-	fmt.Println(password)
+	var userMapper entity.UserMapper
 
-	//success, db := dbs.OpenDB()
-	//if success {
-	//	fmt.Println("open success")
-	//} else {
-	//	fmt.Println("open faile")
-	//}
-	//user,flag := dbs.Sele(dbs.Dbconn, name, pwd)
+	user, e := userMapper.SelectByUserAndPwd(username[0], password[0])
 
-	var terminalsMapper entity.TerminalsMapper
-	//dbs.Engine.WriteMapperPtr(&terminalsMapper,)
-
-	terminals, e := terminalsMapper.SelectAll()
 	if e != nil {
 		fmt.Println(e)
 	}
+	fmt.Println("用户:", user)
 
-	fmt.Println(terminals)
-	if terminals == nil {
+	if user.Id == 0 {
 		t, _ := template.ParseFiles("src/views/error.html")
 		t.Execute(w, "用户名或密码不存在")
 	} else {

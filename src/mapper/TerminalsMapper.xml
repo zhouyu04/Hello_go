@@ -30,4 +30,8 @@
 	<select id="SelectById" resultMap="BaseResultMap">
 		select * from terminals where id = #{id}
 	</select>
+
+	<select id="SelectUser" resultMap="BaseResultMap">
+		select *from terminals where
+	</select>
 </mapper>
